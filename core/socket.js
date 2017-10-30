@@ -1,4 +1,7 @@
+const jwt = require('jsonwebtoken');
 const io = require('socket.io');
+//Token Encryption
+const config = require('./config');
 
 async function onConnect(socket) {
     try {
@@ -7,40 +10,57 @@ async function onConnect(socket) {
             message: ''
         });
 
-        socket.on("Login", async function(data) {
+        socket.on("GetNearstDriverGPS", async function(data) {
             try {
-                if(data.token) {
-                    console.log("Try Login " + data.token);
-                    await socket.emit('LoginStatus', {
-                        success: true,
-                        message: ''
-                    });
+
+                console.log("passengerLoaction=" + data.passengerLoaction);
+                if ((data.passengerLoaction || data.passengerGPS) && data.callDriverType) {
+                    const token = data.token;
+                    if (token) {
+                        try{
+                            const decoded = await jwt.verify(token, config.encryption);
+                            await socket.emit('GetNearstDriverGPS', {
+                                success: true,
+                                exclusiveCarTeam: {
+                                    gps_lat: 21.74,
+                                    gps_lng:121.53,
+                                    distance: 10.5, //km
+                                    time_from_here_to_you: 17 //min
+                                },
+                                otherCarTeam: {
+                                    gps_lat: 21.74,
+                                    gps_lng:121.53,
+                                    distance: 10.5, //km
+                                    time_from_here_to_you: 17 //min
+                                },
+                                message: ''
+                            });
+                        }
+                        catch(err) {
+                            await socket.emit('GetNearstDriverGPS', {
+                                success: false,
+                                message: 'Token valid error.'
+                            });
+                        }
+                    } else {
+                        await socket.emit('GetNearstDriverGPS', {
+                            success: false,
+                            message: 'No token provided.'
+                        });
+                    }
                 }
                 else {
-                    console.log("Login Error ");
-                    await socket.emit('LoginStatus', {
+                    await socket.emit('GetNearstDriverGPS', {
                         success: false,
-                        message: 'must have token'
+                        message: 'You Need passengerLoaction(ex "Dashe street.") OR data.passengerGPS(ex "21.74, 121.53"), and you need callDriverType(ex "1", "2",  or "3").'
                     });
                 }
             }
             catch(err) {
-                console.log(err.message);
-            }
-        });
-
-        socket.on("GetNearstDriverGPS", async function() {
-            try {
                 await socket.emit('GetNearstDriverGPS', {
-                    success: true,
-                    gps_lat: 21.74,
-                    gps_lng:121.53,
-                    distance: 10.5, //km
-                    time_from_here_to_you: 17 //min
+                    success: false,
+                    message: err.message
                 });
-            }
-            catch(err) {
-                console.log(err.message);
             }
         });
 

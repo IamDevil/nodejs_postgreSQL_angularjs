@@ -9,17 +9,12 @@
     <script src="js/bootstrap.min.js"></script>
     <script src="js/angular.min.js"></script>
     <script src="/socket.io/socket.io.js"></script>
-    <script src="js/script.js"></script>
+    <script src="js/socket_service.js"></script>
     <title>Taxi</title>
 </head>
 
-<body ng-app="myApp">
-    <div ng-controller="myCtrl">
-
-        First Name Test: <input type="text" ng-model="firstName"><br>
-        Last Name: <input type="text" ng-model="lastName"><br>
-        <br>
-        Full Name: {{firstName + " " + lastName}}
+<body ng-app="taxiApp">
+    <div ng-controller="taxiController">
 
     </div>
 </body>
