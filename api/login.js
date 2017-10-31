@@ -13,7 +13,8 @@ const config = require('../core/config');
 */
 async function Login(req, res, next) {
     try{
-        const posts = await postgres_db.oneOrNone('select * from public.user_list where user_account = ${user_account} AND user_pass = ${user_pass}' , req.body);
+        console.log(req.body);
+        const posts = await postgres_db.oneOrNone('select * from public.user_list where user_account = ${user_account} AND user_password = ${user_password}' , req.body);
         if(posts === null) {
             res.status(403).json({
                 success: false,

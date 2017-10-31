@@ -1,35 +1,48 @@
-angular.module('taxiApp', []).factory('socketService', ['$q', '$rootScope', function($q, $rootScope) {
-    // We return this object to anything injecting our service
-    let Service = {};
-    // Create our websocket object with the address to the websocket
-    let ws = io.connect();
+(function() {
+    'use strict';
+    angular.module('taxiApp')
+    .factory('socketService', connectService);
 
-    ws.on('ConnectStatus', function(data){
-        if(data.success) {
-            console.log("connected");
-            ws.emit('GetNearstDriverGPS', {
-                passengerLoaction: '123',
-                callDriverType: 1,
-                token: 'abc'
+    function connectService($q, $rootScope) {
+        // We return this object to anything injecting our service
+        let Service = {};
+        // Create our websocket object with the address to the websocket
+        Service.ws;
+
+        Service.tryConnectWeb = function(token, callback) {
+            Service.ws = io.connect({
+                query: {token: token}
+            });
+
+            Service.ws.on('ConnectStatus', function(data){
+                if(data.success) {
+                    callback("connect=> ConnectStatus:" + JSON.stringify(data));
+                }
+                else {
+                    callback("connect error => ConnectStatus:" + JSON.stringify(data));
+                }
+            });
+
+            Service.ws.on('GetNearstDriverGPS', function(data){
+                if(data.success) {
+                    callback("success => GetNearstDriverGPS:"+ JSON.stringify(data));
+                }
+                else {
+                    callback("error => GetNearstDriverGPS:"+ JSON.stringify(data));
+                }
             });
         }
-        else {
-            console.log("connect fail");
-        }
-    });
 
-    ws.on('GetNearstDriverGPS', function(data){
-        if(data.success) {
-            console.log(data);
+        Service.tryGetNearstDriverGPS = function() {
+            if(Service.ws) {
+                Service.ws.emit('GetNearstDriverGPS', {
+                    passengerLoaction: '123',
+                    callDriverType: 1,
+                    token: 'abc'
+                });
+            }
         }
-        else {
-            console.log(data.message);
-        }
-    });
-
-    return Service;
-}]);
-
-angular.module('taxiApp')
-  .controller('taxiController', ['socketService', function(socketService){
-  }]);
+        return Service;
+    }
+    connectService.$inject = ['$q', '$rootScope'];
+})();

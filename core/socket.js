@@ -5,49 +5,40 @@ const config = require('./config');
 
 async function onConnect(socket) {
     try {
-        await socket.emit('ConnectStatus', {
-            success: true,
-            message: ''
-        });
+
+        if(socket.authed) {
+            await socket.emit('ConnectStatus', {
+                success: true,
+                message: ''
+            });
+        }
+        else {
+            await socket.emit('ConnectStatus', {
+                success: false,
+                message: 'token valid error'
+            });
+        }
 
         socket.on("GetNearstDriverGPS", async function(data) {
             try {
-
                 console.log("passengerLoaction=" + data.passengerLoaction);
                 if ((data.passengerLoaction || data.passengerGPS) && data.callDriverType) {
-                    const token = data.token;
-                    if (token) {
-                        try{
-                            const decoded = await jwt.verify(token, config.encryption);
-                            await socket.emit('GetNearstDriverGPS', {
-                                success: true,
-                                exclusiveCarTeam: {
-                                    gps_lat: 21.74,
-                                    gps_lng:121.53,
-                                    distance: 10.5, //km
-                                    time_from_here_to_you: 17 //min
-                                },
-                                otherCarTeam: {
-                                    gps_lat: 21.74,
-                                    gps_lng:121.53,
-                                    distance: 10.5, //km
-                                    time_from_here_to_you: 17 //min
-                                },
-                                message: ''
-                            });
-                        }
-                        catch(err) {
-                            await socket.emit('GetNearstDriverGPS', {
-                                success: false,
-                                message: 'Token valid error.'
-                            });
-                        }
-                    } else {
-                        await socket.emit('GetNearstDriverGPS', {
-                            success: false,
-                            message: 'No token provided.'
-                        });
-                    }
+                    await socket.emit('GetNearstDriverGPS', {
+                        success: true,
+                        exclusiveCarTeam: {
+                            gps_lat: 21.74,
+                            gps_lng:121.53,
+                            distance: 10.5, //km
+                            time_from_here_to_you: 17 //min
+                        },
+                        otherCarTeam: {
+                            gps_lat: 21.74,
+                            gps_lng:121.53,
+                            distance: 10.5, //km
+                            time_from_here_to_you: 17 //min
+                        },
+                        message: ''
+                    });
                 }
                 else {
                     await socket.emit('GetNearstDriverGPS', {

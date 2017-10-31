@@ -5,17 +5,41 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" href="css/bootstrap.min.css">
-    <script src="js/jquery.min.js"></script>
-    <script src="js/bootstrap.min.js"></script>
-    <script src="js/angular.min.js"></script>
-    <script src="/socket.io/socket.io.js"></script>
-    <script src="js/socket_service.js"></script>
     <title>Taxi</title>
 </head>
 
 <body ng-app="taxiApp">
-    <div ng-controller="taxiController">
+    <div class="container" ng-controller="taxiController">
+        <div class="jumbotron">
+            <h1 class="display-3">Taxi API</h1>
+            <p>This web show you tips about Taxi API</p>
+        </div>
 
+        <div class="form-group">
+          <label for="keyword">帳號:</label>
+          <input type="text" class="form-control" id="account" ng-model="account">
+          <label for="keyword">密碼:</label>
+          <input type="text" class="form-control" id="password" ng-model="password">
+        </div>
+        <button type="button" class="btn btn-primary" ng-click="getUserToken()"> 登入</button>
+        <br/>
+        <label for="keyword">Token:</label>
+        <input type="text" class="form-control" id="token" ng-model="token">
+        <button type="button" class="btn btn-primary" ng-click="tryConnect()"> 連線</button>
+        <button type="button" class="btn btn-primary" ng-click="getNearstDriver()"> 取得最近司機</button>
+
+        <div class="form-group">
+          <label for="comment">訊息:</label>
+          <textarea class="form-control" rows="5" id="comment" ng-model="comment"></textarea>
+        </div>
     </div>
+
+    <script src="js/jquery.min.js"></script>
+    <script src="js/bootstrap.min.js"></script>
+    <script src="js/angular.min.js"></script>
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="js/taxi_controller.js"></script>
+    <script src="js/api_service.js"></script>
+    <script src="js/socket_service.js"></script>
 </body>
 </html>
